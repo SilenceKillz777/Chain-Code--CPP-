@@ -24,14 +24,9 @@ class image{
 			imageAry[i] = new int[numCols+2];
 		}
 		
-		CCAry = new int*[numRows+2];
-		for(int i = 0;i < numRows+2; i++){
-			CCAry[i] = new int[numCols+2];
-		}
-		
 	}
 	
-	void zeroFramed(int** imageAry){
+	void zeroFramed(){
 		for(int i=0;i<numRows+2;i++){
 			for(int j=0;j<numCols+2;j++){
 				imageAry[0][j] = 0;
@@ -40,15 +35,9 @@ class image{
 				imageAry[i][numCols+1] = 0;
 			}
 		}
-		for(int i=0;i<numRows+2;i++){
-			for(int j=0;j<numCols+2;j++){
-				cout<<imageAry[i][j]<<" ";
-			}
-			cout<<endl;
-		}
 	}
 	
-	void loadImage(int** imageAry, string input){
+	void loadImage(string input){
 		ifstream in;
 		in.open(input.c_str());
 		in>>numRows>>numCols>>minVal>>maxVal;
@@ -59,11 +48,47 @@ class image{
 			}
 		}
 	}
+	
+	void clearCC(){
+		for(int i=0;i<numRows+2;i++){
+			for(int j=0;j<numCols+2;j++){
+				CCAry[i][j] = 0;
+			}
+		}
+		for(int i=0;i<numRows+2;i++){
+			for(int j=0;j<numCols+2;j++){
+				cout<<CCAry[i][j]<<" ";
+			}
+			cout<<endl;
+		}
+	}
 };
 
 class connectCC{
 	public:
-		
+	
+	int label,totalLabels;
+	int numPixels;
+	int minRow, minCol, maxRow, maxCol;
+	int numRows, numCols, minVal, maxVal;
+	image Image;
+
+	connectCC(int totalLabels, int numRows, int numCols, int minVal, int maxVal){
+		this->numRows = numRows;
+		this->numCols = numCols;
+		this->minVal = minVal;
+		this->maxVal = maxVal;
+		label = 0;
+		image Image(numRows, numCols, minVal, maxVal);
+	}
+	
+	void clearCC(){
+		Image.clearCC();
+	}
+	
+	void loadCC(){
+			
+	}
 		
 };
 
@@ -74,7 +99,7 @@ int main(int argc, char* argv[]){
 	string fileName2 = argv[2];
 	ofstream outFile1 (argv[3]);
 	ofstream outFile2 (argv[4]);
-	int numRows, numCols, minVal, maxVal;
+	int numRows, numCols, minVal, maxVal, totalLabels;
 	int** imageAry;
 	
 	if(labelFile.is_open()){
@@ -83,29 +108,13 @@ int main(int argc, char* argv[]){
 		outFile2<<numRows<<" "<<numCols<<" "<<minVal<<" "<<maxVal<<endl;
 		
 		image init(numRows, numCols, minVal, maxVal);
-		init.loadImage(imageAry,fileName1);
-		init.zeroFramed(imageAry);
-		cout<<"Hello";
-		//setting up arrays
-		
-		 /*
-		//function calls
-		connectedComponents component(numRows, numCols, minVal, maxVal);
-		component.loadImage(zeroFramedAry,fileName);
-		component.zeroFrame(zeroFramedAry);
-		component.ConnectCC_Pass1(zeroFramedAry);
-		component.prettyPrint(zeroFramedAry, outFile1, 1);
-		component.ConnectCC_Pass2(zeroFramedAry);
-		component.prettyPrint(zeroFramedAry, outFile1, 2);
-		component.manageEQAry();
-		var = component.ConnectCC_Pass3(zeroFramedAry);
-		Property CC[var];
-		component.loadStruct(CC, zeroFramedAry, var);
-		component.printStruct(CC, var, outFile3);
-		component.printEQAry(outFile1, "manageEQAry");
-		component.prettyPrint(zeroFramedAry, outFile1, 3);
-		component.printImage(zeroFramedAry, outFile2);
-		*/
+		init.loadImage(fileName1);
+		init.zeroFramed();
+		propFile>>numRows>>numCols>>minVal>>maxVal>>totalLabels;
+		cout<<totalLabels;
+		//connectCC CC(totalLabels,numRows, numCols, minVal, maxVal);
+		//CC.clearCC();
+		//CC.getNextCC(fileName2);
 	}
 	
 	else cout<<"Couldn't retrieve data.";
