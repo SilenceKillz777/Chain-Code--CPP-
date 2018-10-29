@@ -33,8 +33,6 @@ class image{
 		}
 	}
 	
-	
-	
 	//methods
 	void zeroFramed(){
 		for(int i=0;i<numRows+2;i++){
@@ -65,6 +63,7 @@ class image{
 				CCAry[i][j] = 0;
 			}
 		}
+
 		for(int i=0;i<numRows+2;i++){
 			for(int j=0;j<numCols+2;j++){
 				cout<<CCAry[i][j]<<" ";
@@ -81,18 +80,19 @@ class connectCC{
 	int numPixels;
 	int minRow, minCol, maxRow, maxCol;
 	int numRows, numCols, minVal, maxVal;
-	
 	image Image;
+
 	connectCC(int totalLabels, int numRows, int numCols, int minVal, int maxVal){
 		this->numRows = numRows;
 		this->numCols = numCols;
 		this->minVal = minVal;
 		this->maxVal = maxVal;
 		label = 0;
+		image Image();
 	}
 	
 	void clearCC(){
-		Image.clearCC();
+		Image.zeroFramed();
 	}
 	
 	void loadCC(){
@@ -122,7 +122,7 @@ int main(int argc, char* argv[]){
 		propFile>>numRows>>numCols>>minVal>>maxVal>>totalLabels;
 		cout<<totalLabels;
 		connectCC CC(totalLabels,numRows, numCols, minVal, maxVal);
-		CC.clearCC();
+		//CC.clearCC();
 		//CC.getNextCC(fileName2);
 	}
 	
