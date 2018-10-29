@@ -11,7 +11,10 @@ class image{
 	int** imageAry;
 	int** CCAry;
 		
-	//constructor
+	//constructors
+	image(){
+	}
+	
 	image(int numRows, int numCols, int minVal, int maxVal){
 			
 		this->numRows = numRows;
@@ -24,8 +27,15 @@ class image{
 			imageAry[i] = new int[numCols+2];
 		}
 		
+		CCAry = new int*[numRows+2];
+		for(int i = 0;i < numRows+2; i++){
+			CCAry[i] = new int[numCols+2];
+		}
 	}
 	
+	
+	
+	//methods
 	void zeroFramed(){
 		for(int i=0;i<numRows+2;i++){
 			for(int j=0;j<numCols+2;j++){
@@ -71,15 +81,14 @@ class connectCC{
 	int numPixels;
 	int minRow, minCol, maxRow, maxCol;
 	int numRows, numCols, minVal, maxVal;
+	
 	image Image;
-
 	connectCC(int totalLabels, int numRows, int numCols, int minVal, int maxVal){
 		this->numRows = numRows;
 		this->numCols = numCols;
 		this->minVal = minVal;
 		this->maxVal = maxVal;
 		label = 0;
-		image Image(numRows, numCols, minVal, maxVal);
 	}
 	
 	void clearCC(){
@@ -112,8 +121,8 @@ int main(int argc, char* argv[]){
 		init.zeroFramed();
 		propFile>>numRows>>numCols>>minVal>>maxVal>>totalLabels;
 		cout<<totalLabels;
-		//connectCC CC(totalLabels,numRows, numCols, minVal, maxVal);
-		//CC.clearCC();
+		connectCC CC(totalLabels,numRows, numCols, minVal, maxVal);
+		CC.clearCC();
 		//CC.getNextCC(fileName2);
 	}
 	
