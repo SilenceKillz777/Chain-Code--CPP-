@@ -4,6 +4,12 @@
 #include <cstdlib>
 using namespace std;
 
+struct Property{
+	int label;
+	int numPixels;
+	int minRow, minCol, maxRow, maxCol;
+};
+
 class image{
 	public:
 		
@@ -76,7 +82,7 @@ class image{
 			}
 		}
 	}
-	
+	/*
 	void getChainCode(int** CCAry){
 		for(int i=1;i<numRows+1;i++){
 			for(int j=1;j<numCols+1;j++){
@@ -85,7 +91,7 @@ class image{
 			cout<<endl;
 		}
 		cout<<endl;
-	}
+	}*/
 };
 
 class connectCC{
@@ -96,14 +102,25 @@ class connectCC{
 	int minRow, minCol, maxRow, maxCol;
 	int numRows, numCols, minVal, maxVal;
 
-	connectCC(int totalLabels, int numRows, int numCols, int minVal, int maxVal){
+	connectCC(int totalLabels, int numRows, int numCols, int minVal, int maxVal, Property CC[], string propFile){
 		this->numRows = numRows;
 		this->numCols = numCols;
 		this->minVal = minVal;
 		this->maxVal = maxVal;
 		label = 0;
 		image Image(numRows, numCols, minVal, maxVal);
-		
+		ifstream in;
+		in.open(propFile.c_str());
+		in>>this->numRows>>this->numCols>>this->minVal>>this->maxVal;
+		in>>this->totalLabels;
+		for(int i=0;i<totalLabels;i++){
+			in>>CC[i].label;
+			in>>CC[i].numPixels;
+			in>>CC[i].minRow;
+			in>>CC[i].maxRow;
+			in>>CC[i].minCol;
+			in>>CC[i].maxCol;
+		}
 	}
 	
 	void clearCC(int** CCAry){
@@ -115,10 +132,36 @@ class connectCC{
 		image Image(numRows, numCols, minVal, maxVal);		
 		Image.loadCC(CCAry, imageAry, label);
 	}
-	
+	/*
 	void getChainCode(int** CCAry){
 		image Image(numRows, numCols, minVal, maxVal);			
 		Image.getChainCode(CCAry);
+	}
+	*/
+};
+
+class chainCode{
+	public:
+	
+	int label;
+	int numPixels;
+	int minRow, maxRow, minCol, maxCol;
+	
+	chainCode(Property CC[], int component){
+		this->label = component;
+		this->numPixels = CC[label].numPixels;
+		this->minRow = CC[label].minRow;
+		this->maxRow = CC[label].maxRow;
+		this->minCol = CC[label].minCol;
+		this->maxCol = CC[label].maxCol;
+	}
+	
+	getChainCode(int label, int** CCAry){
+		for(int i=minRow;i<maxRow;i++){
+			for(int j=minCol;j<maxCol;j++){
+				
+			}
+		}
 	}
 	
 };
@@ -161,14 +204,16 @@ int main(int argc, char* argv[]){
 		init.zeroFramed(imageAry);
 		propFile>>numRows>>numCols>>minVal>>maxVal>>totalLabels;
 		cout<<"Total Number of Components: "<<totalLabels<<endl<<endl;
-		connectCC CC(totalLabels,numRows, numCols, minVal, maxVal);
+		Property Component[totalLabels];
+		connectCC CC(totalLabels,numRows, numCols, minVal, maxVal, Component, fileName2);
 		while(label<totalLabels){
+			chainCode Chain(Component, label);
 			label++;
 			cout<<"This is component #"<<label<<endl;
 			
 			CC.clearCC(CCAry);
 			CC.loadCC(CCAry, imageAry, label);
-			CC.getChainCode(CCAry);
+			Chain.getChainCode(label, CCAry);
 		}
 	}
 	
