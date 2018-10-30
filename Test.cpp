@@ -80,18 +80,16 @@ class image{
 				if(imageAry[i][j]==label)
 					CCAry[i][j] = imageAry[i][j];
 			}
-		}
-	}
-	/*
-	void getChainCode(int** CCAry){
+		}/*
 		for(int i=1;i<numRows+1;i++){
 			for(int j=1;j<numCols+1;j++){
 				cout<<CCAry[i][j]<<" ";
 			}
 			cout<<endl;
 		}
-		cout<<endl;
-	}*/
+		cout<<endl;*/
+	}
+
 };
 
 class connectCC{
@@ -117,8 +115,8 @@ class connectCC{
 			in>>CC[i].label;
 			in>>CC[i].numPixels;
 			in>>CC[i].minRow;
-			in>>CC[i].maxRow;
 			in>>CC[i].minCol;
+			in>>CC[i].maxRow;
 			in>>CC[i].maxCol;
 		}
 	}
@@ -146,6 +144,7 @@ class chainCode{
 	int label;
 	int numPixels;
 	int minRow, maxRow, minCol, maxCol;
+	int neighborCoord[];
 	
 	chainCode(Property CC[], int component){
 		this->label = component;
@@ -154,14 +153,58 @@ class chainCode{
 		this->maxRow = CC[label].maxRow;
 		this->minCol = CC[label].minCol;
 		this->maxCol = CC[label].maxCol;
+		neighborCoord[8];
+		for(int i=0;i<8;i++){
+			neighborCoord[i] = 0;
+		}
 	}
 	
-	getChainCode(int label, int** CCAry){
-		for(int i=minRow;i<maxRow;i++){
-			for(int j=minCol;j<maxCol;j++){
-				
+	void loadNeighborCoord(int currR, int currC, int** CCAry){
+		int index = 0;
+		for(int row=currR-1;row<currR+2;row++){
+			for(int col=currC-1;col<currC+2;col++){
+				if(row!=currR && col!=currC){
+					neighborCoord[index] = CCAry[row][col];
+				}
 			}
 		}
+	}
+	
+	int findNextP(int currR, int currC, int nextQ, int** CCAry){
+		loadNeighborCoord(currR, currC, CCAry);
+		return 0;
+	}
+	
+	void getChainCode(int label, int** CCAry, ofstream& outFile1, ofstream& outFile2){
+		int startR = 0;
+		int startC = 0;
+		int currR = 0;
+		int currC = 0;
+		int lastQ = 4;
+		int nextQ = 0;
+		bool status = false;
+		for(int iRow=minRow;iRow<maxRow+1;iRow++){
+			for(int jCol=minCol;jCol<maxCol+1;jCol++){
+				if(CCAry[iRow+1][jCol+1]>0){
+					outFile1<<iRow<<" "<<jCol<<" "<<CCAry[iRow+1][jCol+1]<<endl;
+					startR = iRow;
+					startC = jCol;
+					currR = iRow;
+					currC = jCol;
+					nextQ = (lastQ+1)%8;
+					status = true;
+					break;
+				}
+			}
+			if(status)break;
+		}
+		cout<<"StartR: "<<startR<<endl;
+		cout<<"StartC: "<<startC<<endl;
+		cout<<"currR: "<<currR<<endl;
+		cout<<"currC: "<<currC<<endl;
+		cout<<"lastQ: "<<lastQ<<endl;
+		cout<<"nextQ: "<<nextQ<<endl;
+		findNextP(currR, currC, nextQ, CCAry);
 	}
 	
 };
@@ -213,7 +256,8 @@ int main(int argc, char* argv[]){
 			
 			CC.clearCC(CCAry);
 			CC.loadCC(CCAry, imageAry, label);
-			Chain.getChainCode(label, CCAry);
+			Chain.getChainCode(label, CCAry, outFile1, outFile2);
+			cout<<endl;
 		}
 	}
 	
