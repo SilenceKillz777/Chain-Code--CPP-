@@ -145,6 +145,7 @@ class chainCode{
 	int numPixels;
 	int minRow, maxRow, minCol, maxCol;
 	int neighborCoord[];
+	int nextDirTable[2][8];
 	
 	chainCode(Property CC[], int component){
 		this->label = component;
@@ -157,22 +158,55 @@ class chainCode{
 		for(int i=0;i<8;i++){
 			neighborCoord[i] = 0;
 		}
+		nextDirTable[0][0] = 0;
+		nextDirTable[1][0] = 1;
+		nextDirTable[0][1] = -1;
+		nextDirTable[1][1] = 1;
+		nextDirTable[0][2] = -1;
+		nextDirTable[1][2] = 0;
+		nextDirTable[0][3] = -1;
+		nextDirTable[1][3] = -1;
+		nextDirTable[0][4] = 0;
+		nextDirTable[1][4] = -1;
+		nextDirTable[0][5] = 1;
+		nextDirTable[1][5] = -1;
+		nextDirTable[0][6] = 1;
+		nextDirTable[1][6] = 0;
+		nextDirTable[0][7] = 1;
+		nextDirTable[1][7] = 1;
 	}
 	
 	void loadNeighborCoord(int currR, int currC, int** CCAry){
 		int index = 0;
 		for(int row=currR-1;row<currR+2;row++){
 			for(int col=currC-1;col<currC+2;col++){
-				if(row!=currR && col!=currC){
+				if(!(row==currR && col==currC)){
+					//cout<<CCAry[row][col];
 					neighborCoord[index] = CCAry[row][col];
+					index++;
 				}
 			}
 		}
 	}
 	
-	int findNextP(int currR, int currC, int nextQ, int** CCAry){
+	int findNextP(int currR, int currC, int nextQ, int** CCAry, int label, int &nextP){
 		loadNeighborCoord(currR, currC, CCAry);
-		return 0;
+		int chainDir = (nextQ%8);
+		bool status = false;
+		for(int i=chainDir;i<chainDir+8;i++){
+			if(neighborCoord[i%8]==label){
+				chainDir = (i%8);
+				status = true;
+				break;
+			}
+			if(status)break;
+		}
+		nextP = neighborCoord[chainDir];
+		/*
+		for(int i=0;i<8;i++){
+			cout<<neighborCoord[i]<<" ";
+		}*/
+		return chainDir;
 	}
 	
 	void getChainCode(int label, int** CCAry, ofstream& outFile1, ofstream& outFile2){
@@ -182,15 +216,18 @@ class chainCode{
 		int currC = 0;
 		int lastQ = 4;
 		int nextQ = 0;
+		int chainDir = 0;
+		int nextP = 0;
 		bool status = false;
 		for(int iRow=minRow;iRow<maxRow+1;iRow++){
-			for(int jCol=minCol;jCol<maxCol+1;jCol++){
+			for(int jCol=minCol;jCol<maxCol+1;jCol++){				
 				if(CCAry[iRow+1][jCol+1]>0){
-					outFile1<<iRow<<" "<<jCol<<" "<<CCAry[iRow+1][jCol+1]<<endl;
-					startR = iRow;
-					startC = jCol;
-					currR = iRow;
-					currC = jCol;
+					outFile1<<iRow<<" "<<jCol<<" "<<CCAry[iRow+1][jCol+1]<<" ";
+					outFile2<<"Label "<<label<<": ";
+					startR = iRow+1;
+					startC = jCol+1;
+					currR = iRow+1;
+					currC = jCol+1;
 					nextQ = (lastQ+1)%8;
 					status = true;
 					break;
@@ -204,7 +241,17 @@ class chainCode{
 		cout<<"currC: "<<currC<<endl;
 		cout<<"lastQ: "<<lastQ<<endl;
 		cout<<"nextQ: "<<nextQ<<endl;
-		findNextP(currR, currC, nextQ, CCAry);
+		chainDir = findNextP(currR, currC, nextQ, CCAry, label, nextP);
+		cout<<"nextP: "<<nextP<<endl;
+		CCAry[currR][currC] = (0 - (CCAry[currR][currC]));
+		outFile1<<chainDir<<endl;
+		outFile2<<chainDir<<endl;
+		for(int i=0;i<2;i++){
+			for(int j=0;j<8;j++){
+				cout<<nextDirTable[i][j]<<" ";
+			}
+			cout<<endl;
+		}
 	}
 	
 };
